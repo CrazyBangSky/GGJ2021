@@ -71,6 +71,7 @@ public:
 	FVector DefaultBuoyancy;
 
 	/** Max angle the balloon can tilts by player input*/
+	UPROPERTY(EditAnywhere)
 	float MaxAngle;
 
 	/** The min volume of the balloon*/
@@ -104,6 +105,14 @@ public:
 	UPROPERTY(EditAnywhere)
 	float ThrottleForceMultiplier;
 
+	/** Initial impulse after player press throttle*/
+	UPROPERTY(EditAnywhere)
+	float InitImpulse;
+
+	/** The cool down time*/
+	UPROPERTY(EditAnywhere)
+	float CoolDownTime;
+
 private:
 	FVector2D InputValue;
 	bool bIsInThrottle;
@@ -116,8 +125,18 @@ private:
 	/** The actual buoyancy on the balloon*/
 	FVector Buoyancy;
 
+	/** Whether the impulse cool down is completed*/
+	bool bIsCoolDownCompleted;
+
+	/** Cool down timer*/
+	float CoolDownTimer;
+
+
 	void UpdateTargetRotation(float DeltaSeconds);
 
 	void UpdateThrottle(float DeltaSeconds);
+
+	//Apply the impulse at the first frame after player start throttle
+	void ApplyInitImpulse();
 
 };

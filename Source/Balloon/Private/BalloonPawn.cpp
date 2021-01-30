@@ -17,9 +17,13 @@ ABalloonPawn::ABalloonPawn()
 	, AirDrainingMultiplier(1.0f)
 	, RotationSpeedMultiplier(1.0f)
 	, ThrottleForceMultiplier(1.0f)
+	, InitImpulse(0)
+	, CoolDownTime(2.0f)
 	, InputValue(FVector2D(0,0))
 	, bIsInThrottle(false)
 	, bHasAvailableAir(true)
+	, bIsCoolDownCompleted(true)
+	, CoolDownTimer(0)
 	, TargetRotation(FRotator::ZeroRotator)
 {
 
@@ -68,9 +72,8 @@ void ABalloonPawn::BeginPlay()
 
 	//Default Balloon volume
 	BalloonVolume = (MaxVolume - MinVolume)*0.8f + MinVolume;
-	
 
-	
+
 }
 
 // Called every frame
@@ -84,6 +87,16 @@ void ABalloonPawn::Tick(float DeltaTime)
 	UpdateTargetRotation(DeltaTime);
 
 	UpdateThrottle(DeltaTime);
+
+	if (!bIsCoolDownCompleted)
+	{
+		CoolDownTimer += DeltaTime;
+		if (CoolDownTimer > CoolDownTime)
+		{
+			CoolDownTimer = 0;
+			bIsCoolDownCompleted = true;
+		}
+	}
 
 }
 
@@ -115,7 +128,14 @@ void ABalloonPawn::OnThrottleStart()
 	if (!FMath::IsNearlyEqual(BalloonVolume, MinVolume))
 	{
 		//Throttle if still has available air
+
 		bIsInThrottle = true;
+
+		if (bIsCoolDownCompleted)
+		{
+			ApplyInitImpulse();
+			bIsCoolDownCompleted = false;
+		}
 	}
 }
 
@@ -197,6 +217,7 @@ void ABalloonPawn::UpdateTargetRotation(float DeltaSeconds)
 
 	//The angle between target rotation and current rotation
 	float NeededRotationAngle = TargetAngle - CurrentRotationAngle;
+	NeededRotationAngle = FRotator::NormalizeAxis(NeededRotationAngle);
 
 	//The angle of the rotation needed to be made in this tick
 	float AngleIncrement = FMath::Sign(NeededRotationAngle)* FMath::Pow(NeededRotationAngle, 2.0f) / FMath::Pow(180.0f, 2.0f);
@@ -240,4 +261,19 @@ void ABalloonPawn::UpdateThrottle(float DeltaSeconds)
 	BalloonMesh->AddForce(Force*ThrottleForceMultiplier);
 
 	return;
+}
+
+void ABalloonPawn::ApplyInitImpulse()
+{
+	//Get the vector points from balloon center to the balloon bottom.
+	CurrentRotation = ArrowComponent->GetComponentRotation();
+	FVector DownVector = CurrentRotation.RotateVector(FVector::DownVector);
+
+	//The direction of the throttle force should be the oppsite of the down vec
+	FVector Impulse = -DownVector;
+	Impulse.Normalize();
+	Impulse *= InitImpulse;
+
+	//Apply impulse
+	BalloonMesh->AddImpulse(Impulse);
 }
