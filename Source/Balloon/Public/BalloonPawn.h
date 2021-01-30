@@ -45,7 +45,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ApplyHeat(float HeatValue);
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
 	UStaticMeshComponent* BalloonMesh;
 
 	/** Collision component*/
