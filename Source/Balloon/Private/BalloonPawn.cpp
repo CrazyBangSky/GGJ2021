@@ -103,7 +103,7 @@ void ABalloonPawn::Tick(float DeltaTime)
 	CurrentRotation.Normalize();
 	if (FMath::Abs(CurrentRotation.Roll) > MaxAngle)
 	{
-		CurrentRotation = UMoreMath::ClampEachAxis(CurrentRotation, 0, MaxAngle);
+		CurrentRotation = UMoreMath::ClampEachAxis(CurrentRotation, -MaxAngle, MaxAngle);
 		BalloonMesh->SetWorldRotation(CurrentRotation);
 		BalloonMesh->SetPhysicsAngularVelocity(FVector::ZeroVector);
 	}
@@ -212,6 +212,8 @@ void ABalloonPawn::UpdateTargetRotation(float DeltaSeconds)
 	TargetVec.Normalize();
 	
 	float TargetAngle = FMath::RadiansToDegrees(FMath::Acos(FVector2D::DotProduct(DownVec, TargetVec)));
+
+	GEngine->AddOnScreenDebugMessage(4, 2.0f, FColor::Red, FString::Printf(TEXT("Target : %f"),TargetAngle));
 	
 	//If Target vec points to right side, rotate clock-wise
 	if (InputValue.X < 0.0f)
@@ -224,17 +226,24 @@ void ABalloonPawn::UpdateTargetRotation(float DeltaSeconds)
 
 	float CurrentRotationAngle = FRotator::NormalizeAxis(BalloonMesh->GetComponentRotation().Roll);
 
+	GEngine->AddOnScreenDebugMessage(0, 2.0f, FColor::Red, FString::Printf(TEXT("Current Rotation : %f"), CurrentRotationAngle));
+
 	//The angle between target rotation and current rotation
 	float NeededRotationAngle = TargetAngle - CurrentRotationAngle;
 	NeededRotationAngle = FRotator::NormalizeAxis(NeededRotationAngle);
+	
+	GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Red, FString::Printf(TEXT("Needed Rotation : %f"), NeededRotationAngle));
 
 	//The angle of the rotation needed to be made in this tick
 	float AngleIncrement = FMath::Sign(NeededRotationAngle)* FMath::Pow(NeededRotationAngle, 2.0f) / FMath::Pow(180.0f, 2.0f);
 	AngleIncrement *= DeltaSeconds * RotationSpeedMultiplier;
 	FRotator RotationIncrement = FRotator(0, 0, AngleIncrement);
+
+	GEngine->AddOnScreenDebugMessage(2, 2.0f, FColor::Red, FString::Printf(TEXT("Increment : %f"), AngleIncrement));
 	
 	//Update Rotation
-	this->AddActorWorldRotation(RotationIncrement);
+	BalloonMesh->SetPhysicsAngularVelocityInDegrees(FVector::ZeroVector);
+	BalloonMesh->AddWorldRotation(RotationIncrement, true, nullptr, ETeleportType::TeleportPhysics);
 
 	return;
 
