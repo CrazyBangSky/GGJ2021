@@ -41,7 +41,7 @@ public:
 
 	void OnThrottleStop();
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
 	UStaticMeshComponent* BalloonMesh;
 
 	/** Collision component*/
