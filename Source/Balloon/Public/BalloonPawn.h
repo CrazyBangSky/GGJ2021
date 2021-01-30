@@ -41,7 +41,11 @@ public:
 
 	void OnThrottleStop();
 
-	UPROPERTY(EditDefaultsOnly)
+	//Apply heat effect on balloon(Increase or decrease volume)
+	UFUNCTION(BlueprintCallable)
+	void ApplyHeat(float HeatValue);
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	UStaticMeshComponent* BalloonMesh;
 
 	/** Collision component*/
@@ -83,6 +87,10 @@ public:
 	/** How much fast the balloon will expand when taking heat*/
 	UPROPERTY(EditAnyWhere)
 	float HeatExpansionMultiplier;
+
+	/** How mush fast the balloon will shrink when in contact with cold air*/
+	UPROPERTY(EditAnywhere)
+	float ColdContractionMultiplier;
 
 	/** How much fast the balloon will shrink when releasing air*/
 	UPROPERTY(EditAnywhere)
