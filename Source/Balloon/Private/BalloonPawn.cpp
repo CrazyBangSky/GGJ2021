@@ -13,6 +13,7 @@ ABalloonPawn::ABalloonPawn()
 	, MaxVolume(120.0f)
 	, InputDeadZone(0.1f)
 	, HeatExpansionMultiplier(1.0f)
+	, ColdContractionMultiplier(1.0f)
 	, AirDrainingMultiplier(1.0f)
 	, RotationSpeedMultiplier(1.0f)
 	, ThrottleForceMultiplier(1.0f)
@@ -121,6 +122,26 @@ void ABalloonPawn::OnThrottleStart()
 void ABalloonPawn::OnThrottleStop()
 {
 	bIsInThrottle = false;
+}
+
+void ABalloonPawn::ApplyHeat(float HeatValue)
+{
+	if (HeatValue > 0)
+	{
+		BalloonVolume += HeatValue * HeatExpansionMultiplier;
+		BalloonVolume = FMath::Clamp(BalloonVolume, MinVolume, MaxVolume);
+	}
+	else if (HeatValue < 0)
+	{
+		BalloonVolume += HeatValue * ColdContractionMultiplier;
+		BalloonVolume = FMath::Clamp(BalloonVolume, MinVolume, MaxVolume);
+	}
+
+	//Air drained
+	if (FMath::IsNearlyEqual(BalloonVolume, MinVolume))
+	{
+		bIsInThrottle = false;
+	}
 }
 
 void ABalloonPawn::UpdateTargetRotation(float DeltaSeconds)
