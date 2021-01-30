@@ -98,6 +98,15 @@ void ABalloonPawn::Tick(float DeltaTime)
 		}
 	}
 
+	//Clamp current rotation
+	CurrentRotation = BalloonMesh->GetComponentRotation();
+	CurrentRotation.Normalize();
+	if (FMath::Abs(CurrentRotation.Roll) > MaxAngle)
+	{
+		CurrentRotation = UMoreMath::ClampEachAxis(CurrentRotation, 0, MaxAngle);
+		BalloonMesh->SetWorldRotation(CurrentRotation);
+		BalloonMesh->SetPhysicsAngularVelocity(FVector::ZeroVector);
+	}
 }
 
 // Called to bind functionality to input

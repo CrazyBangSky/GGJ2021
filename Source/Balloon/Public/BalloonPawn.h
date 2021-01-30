@@ -113,6 +113,10 @@ public:
 	UPROPERTY(EditAnywhere)
 	float CoolDownTime;
 
+	/** Air Drained delegate*/
+	UPROPERTY(BlueprintReadWrite)
+	FOnBalloonAirDrained AirDrainedDelegate;
+
 private:
 	FVector2D InputValue;
 	bool bIsInThrottle;
