@@ -171,6 +171,12 @@ void ABalloonPawn::ApplyHeat(float HeatValue)
 	{
 		bIsInThrottle = false;
 	}
+
+	//Update volume
+	float DefaultVolume = (MaxVolume - MinVolume)*0.8f + MinVolume;
+
+	this->SetActorRelativeScale3D(FVector::OneVector*(BalloonVolume / DefaultVolume));
+
 }
 
 void ABalloonPawn::UpdateTargetRotation(float DeltaSeconds)
@@ -274,7 +280,7 @@ void ABalloonPawn::UpdateThrottle(float DeltaSeconds)
 
 	float DefaultVolume = (MaxVolume - MinVolume)*0.8f + MinVolume;
 
-	BalloonMesh->SetRelativeScale3D(FVector::OneVector*(BalloonVolume / DefaultVolume));
+	this->SetActorRelativeScale3D(FVector::OneVector*(BalloonVolume / DefaultVolume));
 
 	BalloonMesh->AddForce(Force*ThrottleForceMultiplier);
 
