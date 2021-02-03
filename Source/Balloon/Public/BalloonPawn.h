@@ -42,7 +42,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void OnThrottleStop();
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable) 
 	void ResetRotationAndScale();
 
 	//Apply heat effect on balloon(Increase or decrease volume)
