@@ -39,7 +39,11 @@ public:
 
 	void OnThrottleStart();
 
+	UFUNCTION(BlueprintCallable)
 	void OnThrottleStop();
+
+	UFUNCTION(BlueprintCallable)
+	void ResetRotationAndScale();
 
 	//Apply heat effect on balloon(Increase or decrease volume)
 	UFUNCTION(BlueprintCallable)
@@ -67,7 +71,7 @@ public:
 	FRotator CurrentRotation;
 
 	/** The default value of buoyancy on the balloon*/
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FVector DefaultBuoyancy;
 
 	/** Max angle the balloon can tilts by player input*/
@@ -114,7 +118,7 @@ public:
 	float CoolDownTime;
 
 	/** Air Drained delegate*/
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintAssignable)
 	FOnBalloonAirDrained AirDrainedDelegate;
 
 private:
@@ -122,6 +126,7 @@ private:
 	bool bIsInThrottle;
 	float BalloonVolume;
 	bool bHasAvailableAir;
+	FVector InitalScale;
 
 	/** Base on player input The supposed down direction of the balloon*/
 	FRotator TargetRotation;
