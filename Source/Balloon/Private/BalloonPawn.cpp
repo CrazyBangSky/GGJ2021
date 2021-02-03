@@ -22,6 +22,7 @@ ABalloonPawn::ABalloonPawn()
 	, InputValue(FVector2D(0,0))
 	, bIsInThrottle(false)
 	, bHasAvailableAir(true)
+	, InitalScale(FVector::ZeroVector)
 	, bIsCoolDownCompleted(true)
 	, CoolDownTimer(0)
 	, TargetRotation(FRotator::ZeroRotator)
@@ -72,6 +73,8 @@ void ABalloonPawn::BeginPlay()
 
 	//Default Balloon volume
 	BalloonVolume = (MaxVolume - MinVolume)*0.8f + MinVolume;
+
+	InitalScale = BalloonMesh->GetComponentScale();
 
 
 }
@@ -153,6 +156,14 @@ void ABalloonPawn::OnThrottleStop()
 	bIsInThrottle = false;
 }
 
+void ABalloonPawn::ResetRotationAndScale()
+{
+	BalloonMesh->SetWorldRotation(FRotator::ZeroRotator);
+
+	BalloonVolume = (MaxVolume - MinVolume) * 0.8f + MinVolume;
+	this->SetActorScale3D(InitalScale);
+}
+
 void ABalloonPawn::ApplyHeat(float HeatValue)
 {
 	if (HeatValue > 0)
@@ -170,12 +181,13 @@ void ABalloonPawn::ApplyHeat(float HeatValue)
 	if (FMath::IsNearlyEqual(BalloonVolume, MinVolume))
 	{
 		bIsInThrottle = false;
+		AirDrainedDelegate.Broadcast();
 	}
 
 	//Update volume
 	float DefaultVolume = (MaxVolume - MinVolume)*0.8f + MinVolume;
 
-	this->SetActorScale3D(FVector::OneVector*(BalloonVolume / DefaultVolume));
+	this->SetActorScale3D(InitalScale*(BalloonVolume / DefaultVolume));
 
 }
 
@@ -276,11 +288,12 @@ void ABalloonPawn::UpdateThrottle(float DeltaSeconds)
 	if (FMath::IsNearlyEqual(BalloonVolume, MinVolume))
 	{
 		bIsInThrottle = false;
+		AirDrainedDelegate.Broadcast();
 	}
 
 	float DefaultVolume = (MaxVolume - MinVolume)*0.8f + MinVolume;
 
-	this->SetActorScale3D(FVector::OneVector*(BalloonVolume / DefaultVolume));
+	this->SetActorScale3D(InitalScale*(BalloonVolume / DefaultVolume));
 
 	BalloonMesh->AddForce(Force*ThrottleForceMultiplier);
 
